@@ -7,19 +7,19 @@ CL := $(CC65_PATH)/cl65
 AR := $(CC65_PATH)/ar65
 
 # POSIX-style programs
-CHMOD := chmod.exe +w
-CP := cp.exe
+CHMOD := chmod +w
+CP := cp
 #MKDIR := mkdir.exe
 
 # VICE programs
 #VICEPATH := C:\WinVICE-2.4\WinVICE-2.4.28-x86-r31264
-VICEPATH := /mnt/f/WinVICE-3.0/WinVICE-3.1-x86
-C1541 := $(VICEPATH)/c1541.exe
-X64 := $(VICEPATH)/x64.exe -autostart
-X128 := $(VICEPATH)/x128.exe -autostart
-XPET := $(VICEPATH)/xpet.exe -autostart
-XVIC := $(VICEPATH)/xvic.exe -autostart
-XPLUS4 := $(VICEPATH)/xplus4.exe -autostart
+VICEPATH := /usr/local/bin
+C1541 := $(VICEPATH)/c1541
+X64 := $(VICEPATH)/x64 -autostart
+X128 := $(VICEPATH)/x128 -autostart
+XPET := $(VICEPATH)/xpet -autostart
+XVIC := $(VICEPATH)/xvic -autostart
+XPLUS4 := $(VICEPATH)/xplus4 -autostart
 
 T := c128
 
