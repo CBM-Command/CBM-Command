@@ -1,27 +1,25 @@
 # Program declarations
-CC65_PATH = "C:\Users\Payton\Source\Repos\cc65\bin"
-CC := $(CC65_PATH)\cc65.exe
-CA := $(CC65_PATH)\ca65.exe
-LD := $(CC65_PATH)\ld65.exe
-CL := $(CC65_PATH)\cl65.exe
-AR := $(CC65_PATH)\ar65.exe
+CC := cc65
+CA := ca65
+LD := ld65
+CL := cl65
+AR := ar65
 
 # POSIX-style programs
-CHMOD := chmod.exe +w
-CP := cp.exe
-#MKDIR := mkdir.exe
+CHMOD := chmod +w
+CP := cp
+MKDIR := mkdir
+RMDIR := rm -rf
 
 # VICE programs
-VICEPATH := C:\WinVICE-2.4\WinVICE-2.4.28-x86-r31264
-#VICEPATH := s:\winvice-2.4.1
-C1541 := $(VICEPATH)\c1541.exe
-X64 := $(VICEPATH)\x64.exe -autostart
-X128 := $(VICEPATH)\x128.exe -autostart
-XPET := $(VICEPATH)\xpet.exe -autostart
-XVIC := $(VICEPATH)\xvic.exe -autostart
-XPLUS4 := $(VICEPATH)\xplus4.exe -autostart
+C1541 := c1541
+X64 := x64 -autostart
+X128 := x128 -autostart
+XPET := xpet -autostart
+XVIC := xvic -autostart
+XPLUS4 := xplus4 -autostart
 
-T := c128
+T := c64
 
 VIC_CONFIG := vic20-32k.cfg
 
@@ -67,7 +65,7 @@ ASMFILES := \
 LIBFILES := \
 	cc65/common/strcat.s \
 	cc65/cbm/cbm_dir.c \
-	cc65/cbm\cbm_open.s \
+	cc65/cbm/cbm_open.s \
 	cc65/cbm/cclear.s \
 	cc65/cbm/chline.s \
 	cc65/cbm/cvline.s \
@@ -77,7 +75,7 @@ LIBFILES := \
 	cc65/conio/callgoto.s
 
 #DEBUG := -T --check-stack
-CFLAGS := -Wl -D,__STACKSIZE__=$$400
+CFLAGS := -Wl -D__STACKSIZE__=$400
 CFLAGS1 := $(CFLAGS) $(DEBUG) #-m $(T)/cmd.map
 CFLAGS2 := $(CFLAGS) #-m $(T)/cfg.map
 
@@ -89,7 +87,6 @@ CONFIG_PROGRAM := $(CONFIG_TITLE).$(T)
 
 LIBS := $(T)/cc65.lib
 
-# Default target -- It builds for the C128.
 .PHONY: all
 ifeq "$(T)" "pet"
 all: pet/$(PROGRAM)40 pet/$(PROGRAM)80 pet/$(CONFIG_PROGRAM)40 pet/$(CONFIG_PROGRAM)80
@@ -102,7 +99,6 @@ endif
 ifeq "$(T)" "pet"
 vice: clean pet\$(TITLE).pet80
 		$(XPET) pet\$(TITLE).pet80
-#		$(XPET) pet\$(TITLE).pet40
 else
 vice: clean $(T)/$(PROGRAM)
 ifeq "$(T)" "c64"
@@ -126,11 +122,9 @@ D64: all
 	$(CHMOD) $(TITLE).d64
 
 	$(C1541) $(TITLE).d64 -write c64\$(TITLE).c64 -write c128\$(TITLE).c128
-#	$(C1541) $(TITLE).d64 -write pet\$(TITLE).pet40 -write pet\$(TITLE).pet80
 	$(C1541) $(TITLE).d64 -write vic20\$(TITLE).vic20 -write plus4\$(TITLE).plus4
 
 	$(C1541) $(TITLE).d64 -write c64\$(CONFIG_TITLE).c64 -write c128\$(CONFIG_TITLE).c128
-#	$(C1541) $(TITLE).d64 -write pet\$(CONFIG_TITLE).pet40 -write pet\$(CONFIG_TITLE).pet80
 	$(C1541) $(TITLE).d64 -write vic20\$(CONFIG_TITLE).vic20 -write plus4\$(CONFIG_TITLE).plus4
 
 D80: all
@@ -139,12 +133,8 @@ D80: all
 	$(CHMOD) $(TITLE).d80
 
 	$(C1541) $(TITLE).d80 -write pet\$(TITLE).pet40 -write pet\$(TITLE).pet80
-#	$(C1541) $(TITLE).d80 -write c64\$(TITLE).c64 -write c128\$(TITLE).c128
-#	$(C1541) $(TITLE).d80 -write vic20\$(TITLE).vic20 -write plus4\$(TITLE).plus4
 
 	$(C1541) $(TITLE).d80 -write pet\$(CONFIG_TITLE).pet40 -write pet\$(CONFIG_TITLE).pet80
-#	$(C1541) $(TITLE).d80 -write c64\$(CONFIG_TITLE).c64 -write c128\$(CONFIG_TITLE).c128
-#	$(C1541) $(TITLE).d80 -write vic20\$(CONFIG_TITLE).vic20 -write plus4\$(CONFIG_TITLE).plus4
 
 # Build our programs
 $(T)/$(PROGRAM) pet/$(PROGRAM)40: $(SOURCES) $(ASMFILES) $(LIBS)
@@ -158,6 +148,11 @@ $(T)/$(CONFIG_PROGRAM) pet/$(CONFIG_PROGRAM)40: $(CONFIG_SOURCES) res/$(T)/Platf
 
 pet/$(CONFIG_PROGRAM)80: $(CONFIG_SOURCES) res/pet/PlatformSpecific.s $(LIBS)
 		$(CL) -D _PET80_ $(CFLAGS2) -Or -t pet -o $@ $+
+
+$(LIBS): | $(T)
+
+$(T):
+	$(MKDIR) $(T)
 
 $(LIBS): $(LIBFILES)
 		$(CL) -Or -t $(T) -c $?
@@ -175,7 +170,7 @@ clean: mostly-clean
 ifeq "$(T)" "pet"
 		$(RM) ${wildcard pet/$(TITLE).pet* pet/$(CONFIG_TITLE).pet*}
 else
-		$(RM) $(T)/$(PROGRAM) $(T)/$(CONFIG_PROGRAM)
+		$(RMDIR) $(T)
 endif
 
 zap: clean

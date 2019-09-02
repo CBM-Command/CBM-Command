@@ -156,7 +156,7 @@ void load(void)
 }
 
 #if defined(__CBM__)
-static void loadCBM(void)
+void loadCBM(void)
 {
 	//cbm_open(15, getcurrentdevice(), 15, "");	// open the status channel
 	if (cbm_open(1,
