@@ -730,7 +730,7 @@ void copyFiles(void)
 	}
 }
 
-static void reloadPanels(void)
+void reloadPanels(void)
 {
 #if size_x > 40
 	retrieveScreen();

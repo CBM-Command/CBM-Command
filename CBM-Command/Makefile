@@ -1,27 +1,27 @@
-# Program declarations
-CC65_PATH = ~/.local/bin
-CC := $(CC65_PATH)/cc65
-CA := $(CC65_PATH)/ca65
-LD := $(CC65_PATH)/ld65
-CL := $(CC65_PATH)/cl65
-AR := $(CC65_PATH)/ar65
+# Tool declarations
+#CC65_PATH := $(HOME)/.local/bin/
+CC := $(CC65_PATH)cc65
+CA := $(CC65_PATH)ca65
+LD := $(CC65_PATH)ld65
+CL := $(CC65_PATH)cl65
+AR := $(CC65_PATH)ar65
 
 # POSIX-style programs
 CHMOD := chmod +w
 CP := cp
-#MKDIR := mkdir.exe
+MKDIR := mkdir
+RMDIR := $(RM) -r
 
 # VICE programs
-#VICEPATH := C:\WinVICE-2.4\WinVICE-2.4.28-x86-r31264
-VICEPATH := /usr/local/bin
-C1541 := $(VICEPATH)/c1541
-X64 := $(VICEPATH)/x64 -autostart
-X128 := $(VICEPATH)/x128 -autostart
-XPET := $(VICEPATH)/xpet -autostart
-XVIC := $(VICEPATH)/xvic -autostart
-XPLUS4 := $(VICEPATH)/xplus4 -autostart
+#VICEPATH := /usr/local/bin/
+C1541 := $(VICEPATH)c1541
+X64 := $(VICEPATH)x64 -autostart
+X128 := $(VICEPATH)x128 -autostart
+XPET := $(VICEPATH)xpet -autostart
+XVIC := $(VICEPATH)xvic -autostart
+XPLUS4 := $(VICEPATH)xplus4 -autostart
 
-T := c128
+T := c64
 
 VIC_CONFIG := vic20-32k.cfg
 
@@ -77,7 +77,7 @@ LIBFILES := \
 	cc65/conio/callgoto.s
 
 #DEBUG := -T --check-stack
-CFLAGS := -Wl #-D,__STACKSIZE__=$$400
+CFLAGS := -Wl -D__STACKSIZE__=$400
 CFLAGS1 := $(CFLAGS) $(DEBUG) #-m $(T)/cmd.map
 CFLAGS2 := $(CFLAGS) #-m $(T)/cfg.map
 
@@ -89,7 +89,6 @@ CONFIG_PROGRAM := $(CONFIG_TITLE).$(T)
 
 LIBS := $(T)/cc65.lib
 
-# Default target -- It builds for the C128.
 .PHONY: all
 ifeq "$(T)" "pet"
 all: pet/$(PROGRAM)40 pet/$(PROGRAM)80 pet/$(CONFIG_PROGRAM)40 pet/$(CONFIG_PROGRAM)80
@@ -125,15 +124,13 @@ D64: all
 	$(CP) $(TITLE)_master.d64 $(TITLE).d64
 	$(CHMOD) $(TITLE).d64
 
-	$(C1541) $(TITLE).d64 -write c64/$(TITLE).c64 $(TITLE).c64
-	$(C1541) $(TITLE).d64 -write c128/$(TITLE).c128 $(TITLE).c128
-	$(C1541) $(TITLE).d64 -write vic20/$(TITLE).vic20 $(TITLE).vic20
-	$(C1541) $(TITLE).d64 -write plus4/$(TITLE).plus4 $(TITLE).plus4
+	$(C1541) $(TITLE).d64 -write c64/$(TITLE).c64 -write c128/$(TITLE).c128
+	$(C1541) $(TITLE).d64 -write vic20/$(TITLE).vic20 -write plus4/$(TITLE).plus4
+#	$(C1541) $(TITLE).d64 -write pet/$(TITLE).pet40 -write pet/$(TITLE).pet80
 
-	$(C1541) $(TITLE).d64 -write c64/$(CONFIG_TITLE).c64 $(CONFIG_TITLE).c64
-	$(C1541) $(TITLE).d64 -write c128/$(CONFIG_TITLE).c128 $(CONFIG_TITLE).c128
-	$(C1541) $(TITLE).d64 -write vic20/$(CONFIG_TITLE).vic20 $(CONFIG_TITLE).vic20
-	$(C1541) $(TITLE).d64 -write plus4/$(CONFIG_TITLE).plus4 $(CONFIG_TITLE).plus4
+	$(C1541) $(TITLE).d64 -write c64/$(CONFIG_TITLE).c64 -write c128/$(CONFIG_TITLE).c128
+	$(C1541) $(TITLE).d64 -write vic20/$(CONFIG_TITLE).vic20 -write plus4/$(CONFIG_TITLE).plus4
+#	$(C1541) $(TITLE).d64 -write pet/$(CONFIG_TITLE).pet40 -write pet/$(CONFIG_TITLE).pet80
 
 D80: all
 	$(RM) $(TITLE).d80
@@ -141,12 +138,12 @@ D80: all
 	$(CHMOD) $(TITLE).d80
 
 	$(C1541) $(TITLE).d80 -write pet/$(TITLE).pet40 -write pet/$(TITLE).pet80
-#	$(C1541) $(TITLE).d80 -write c64/$(TITLE).c64 -write c128\$(TITLE).c128
-#	$(C1541) $(TITLE).d80 -write vic20/$(TITLE).vic20 -write plus4\$(TITLE).plus4
+	$(C1541) $(TITLE).d80 -write c64/$(TITLE).c64 -write c128/$(TITLE).c128
+	$(C1541) $(TITLE).d80 -write vic20/$(TITLE).vic20 -write plus4/$(TITLE).plus4
 
 	$(C1541) $(TITLE).d80 -write pet/$(CONFIG_TITLE).pet40 -write pet/$(CONFIG_TITLE).pet80
-#	$(C1541) $(TITLE).d80 -write c64/$(CONFIG_TITLE).c64 -write c128\$(CONFIG_TITLE).c128
-#	$(C1541) $(TITLE).d80 -write vic20/$(CONFIG_TITLE).vic20 -write plus4\$(CONFIG_TITLE).plus4
+	$(C1541) $(TITLE).d80 -write c64/$(CONFIG_TITLE).c64 -write c128/$(CONFIG_TITLE).c128
+	$(C1541) $(TITLE).d80 -write vic20/$(CONFIG_TITLE).vic20 -write plus4/$(CONFIG_TITLE).plus4
 
 # Build our programs
 $(T)/$(PROGRAM) pet/$(PROGRAM)40: $(SOURCES) $(ASMFILES) $(LIBS)
@@ -160,6 +157,11 @@ $(T)/$(CONFIG_PROGRAM) pet/$(CONFIG_PROGRAM)40: $(CONFIG_SOURCES) res/$(T)/Platf
 
 pet/$(CONFIG_PROGRAM)80: $(CONFIG_SOURCES) res/pet/PlatformSpecific.s $(LIBS)
 		$(CL) -D _PET80_ $(CFLAGS2) -Or -t pet -o $@ $+
+
+$(LIBS): | $(T)
+
+$(T):
+	$(MKDIR) $(T)
 
 $(LIBS): $(LIBFILES)
 		$(CL) -Or -t $(T) -c $?
@@ -177,7 +179,7 @@ clean: mostly-clean
 ifeq "$(T)" "pet"
 		$(RM) ${wildcard pet/$(TITLE).pet* pet/$(CONFIG_TITLE).pet*}
 else
-		$(RM) $(T)/$(PROGRAM) $(T)/$(CONFIG_PROGRAM)
+		$(RMDIR) $(T)
 endif
 
 zap: clean
