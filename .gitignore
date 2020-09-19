@@ -1,14 +1,14 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
 /CBM-Command.VC.VC.opendb
 /CBM-Command.VC.db
-C64
-C128
 /CBM-Command/A2
-PLUS4
-VIC20
+c128
+c64
+pet
+plus4
+vic20
 *.o
+*.lbl
 *.log
+*.map
 cbmcommand.d64
+cbmcommand.d80
