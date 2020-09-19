@@ -1,1 +1,5 @@
 * text=auto
+*.d?? binary
+*.png binary
+*.jpg binary
+*.nupkg
