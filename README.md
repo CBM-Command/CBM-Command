@@ -4,9 +4,9 @@
 
 ## What does it do?
 
-It works on both real machines and the VICE emulators.  
+It works on both real machines and the VICE emulators.
 
-So far, we have tested it with the following hardware:
+So far, we have tested it with the following hardware:
 
 *   Flat Commodore 128 w/JiffyDOS
 *   Commodore 1571 w/JiffyDOS
@@ -30,7 +30,7 @@ Additional testing has been performed under VICE, using the following file syste
 *   1551 TDE
 *   1571 TDE
 *   1581 TDE
-*   CBM 8050 TDE
+*   CBM 8050 TDE
 *   CBM 8250 TDE
 *   Commodore Plus 4 Emulation
 *   Commodore VIC 20 Emulation
@@ -55,11 +55,12 @@ Additional testing has been performed under VICE, using the following file syste
 
 **CBM-Command** has been developed with the following tools:
 
-*   CC65 [link](http://www.cc65.org/) -- C and Assembler compilers with linker, for building 6502-based binaries.
+*   CC65 [link](https://cc65.github.io/) -- C and Assembly compilers with linker, for building 6502-based binaries.
 *   GNU Make [link](http://www.gnu.org/software/make/) -- Makefile processor which builds the sources, using CC65.
 *   Visual Studio 2010 [link](http://blogs.msdn.com/danielfe/archive/2009/10/21/download-visual-studio-2010-express-editions.aspx) -- I suggest downloading the ISO with all of the express editions; but specifically, you need the C++ edition.
-*   WinVICE [link](http://vice-emu.sf.net/ "VICE Home Page") -- The best Commodore emulators available.
-*   CodePlex [link](http://www.codeplex.com/) -- Project management and source control.
+*   VICE [link](http://vice-emu.sf.net/ "VICE Home Page") -- The best Commodore emulators available.
+*   CodePlex [link](http://www.codeplex.com/) -- Previous project management and source control.
+*   Github [link](https://github.com/) -- Current project management and source control.
 
 ## HELP!
 
@@ -68,4 +69,3 @@ I'm looking for folks who want to adopt portions of the code, and help to make i
 # Screenshots
 
 *   Removed old screenshots -- need to make new ones that are representative of the current code and platforms.
-
