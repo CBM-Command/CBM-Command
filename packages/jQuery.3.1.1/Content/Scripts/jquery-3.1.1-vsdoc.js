@@ -1,4 +1,4 @@
-﻿/*
+/*
 * This file has been generated to support Visual Studio IntelliSense.
 * You should not use this file at runtime inside the browser--it is only
 * intended to be used only for design-time IntelliSense.  Please use the
