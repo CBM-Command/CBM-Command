@@ -1,6 +1,6 @@
 ;
 ; 2003-04-09, Ullrich von Bassewitz
-; 2012-09-10, Greg King
+; 2020-09-22, Greg King
 ; Using lots of code from MagerValp, MagerValp@cling.gu.se
 ;
 ; void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
@@ -11,7 +11,7 @@
 	.export		cputdirect, putchar, newline, plot
 
 	.import		callgoto
-	.import		PLOT
+	.import		PLOT, NEWLINE, PRINT
 
 	.include	"c128.inc"
 

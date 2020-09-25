@@ -78,21 +78,21 @@ static const char* const quit_message[] =
 // Locations of screen and keyboard variables
 // that are used by Commodore Kernals
 #if defined(__VIC20__) || defined(__C64__)
-#define LINE_TABLE ((unsigned char[size_y])0xD9)
-#define KB_COUNT (*(unsigned char*)198)
-#define KB_QUEUE ((unsigned char[10])631)
+#define LINE_TABLE ((unsigned char *)0xD9)
+#define KB_COUNT (*(unsigned char *)198)
+#define KB_QUEUE ((char *)631)
 #endif
 #if defined(__C128__)
-#define KB_COUNT (*(unsigned char*)0xD0)
-#define KB_QUEUE ((unsigned char[10])0x034A)
+#define KB_COUNT (*(unsigned char *)0xD0)
+#define KB_QUEUE ((char *)0x034A)
 #endif
 #if defined(__PET__)
-#define KB_COUNT (*(unsigned char*)0x9E)
-#define KB_QUEUE ((unsigned char[10])0x026F)
+#define KB_COUNT (*(unsigned char *)0x9E)
+#define KB_QUEUE ((char *)0x026F)
 #endif
 #if defined(__PLUS4__)
-#define KB_COUNT (*(unsigned char*)0xEF)
-#define KB_QUEUE ((unsigned char[10])0x0527)
+#define KB_COUNT (*(unsigned char *)0xEF)
+#define KB_QUEUE ((char *)0x0527)
 #endif
 
 // Names of Unique Disk Formats
@@ -459,7 +459,7 @@ void copyFiles(void)
 	}
 
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 	timeStart = clock();
 #else
 	timeStart = time(NULL);
@@ -564,7 +564,7 @@ void copyFiles(void)
 									break;
 								}
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 								timeSpent = (clock() - timeStart) / CLOCKS_PER_SEC;
 #else
 								timeSpent = (time(NULL) - timeStart);
@@ -717,7 +717,7 @@ void copyFiles(void)
 		reloadPanels();
 
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 		timeSpent = (clock() - timeStart) / CLOCKS_PER_SEC;
 #else
 		timeSpent = (time(NULL) - timeStart);
@@ -1259,7 +1259,7 @@ bool __fastcall createDiskImage(const char *filename)
 				if((r = cbmOpen(2, sd, 2, "", "#", 15)) == 0)
 				{
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 					timeStart = clock();
 #else
 					timeStart = time(NULL);
@@ -1296,7 +1296,7 @@ bool __fastcall createDiskImage(const char *filename)
 									sprintf(buffer,"u1 2 0 %u %u", i+1, j));
 
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 								timeSpent = (clock() - timeStart) / CLOCKS_PER_SEC;
 #else
 								timeSpent = (time(NULL) - timeStart);
@@ -1335,7 +1335,7 @@ bool __fastcall createDiskImage(const char *filename)
 						cbm_close(2); cbm_close(3);
 						cbm_close(15); cbm_close(14);
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 						timeSpent = (clock() - timeStart) / CLOCKS_PER_SEC;
 #else
 						timeSpent = (time(NULL) - timeStart);
@@ -1364,9 +1364,9 @@ bool __fastcall createDiskImage(const char *filename)
 					{
 #if size_x > 22
 						writeStatusBarf("Target: %s",
-							r >= 0 ? "unit not there" : buffer);
+							r >= 0 ? "unit not there" : (char *)buffer);
 #else
-						writeStatusBar(r >= 0 ? "Target not there" : buffer);
+						writeStatusBar(r >= 0 ? "Target not there" : (char *)buffer);
 #endif
 						cbm_close(3); cbm_close(14);
 					}
@@ -1375,9 +1375,9 @@ bool __fastcall createDiskImage(const char *filename)
 				{
 #if size_x > 22
 					writeStatusBarf("Source: %s",
-						r >= 0 ? "unit not there" : buffer);
+						r >= 0 ? "unit not there" : (char *)buffer);
 #else
-					writeStatusBar(r >= 0 ? "Source not there" : buffer);
+					writeStatusBar(r >= 0 ? "Source not there" : (char *)buffer);
 #endif
 				}
 				cbm_close(2); cbm_close(15);
@@ -1539,7 +1539,7 @@ void writeDiskImage(void)
 
 						writeStatusBar("Making disk...");
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 						timeStart = clock();
 #else
 						timeStart = time(NULL);
@@ -1605,7 +1605,7 @@ void writeDiskImage(void)
 									sprintf(buffer, "u2 3 0 %u %u", i+1, j));
 
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 								timeSpent = (clock() - timeStart) / CLOCKS_PER_SEC;
 #else
 								timeSpent = (time(NULL) - timeStart);
@@ -1638,7 +1638,7 @@ void writeDiskImage(void)
 						cbm_close(14);
 						cbm_close(15);
 #ifndef __VIC20__
-#ifdef __PET__
+#if defined(__PET__) || defined(__PLUS4__)
 						timeSpent = (clock() - timeStart) / CLOCKS_PER_SEC;
 #else
 						timeSpent = (time(NULL) - timeStart);
@@ -1665,9 +1665,9 @@ void writeDiskImage(void)
 					{
 #if size_x > 22
 						writeStatusBarf("Target: %s",
-							r >= 0 ? "unit not there" : buffer);
+							r >= 0 ? "unit not there" : (char *)buffer);
 #else
-						writeStatusBar(r >= 0 ? "Target not there" : buffer);
+						writeStatusBar(r >= 0 ? "Target not there" : (char *)buffer);
 #endif
 						cbm_close(3); cbm_close(14);
 						//waitForEnterEsc();
@@ -1677,9 +1677,9 @@ void writeDiskImage(void)
 				{
 #if size_x > 22
 					writeStatusBarf("Source: %s",
-						r >= 0 ? "unit not there" : buffer);
+						r >= 0 ? "unit not there" : (char *)buffer);
 #else
-					writeStatusBar(r >= 0 ? "Source not there" : buffer);
+					writeStatusBar(r >= 0 ? "Source not there" : (char *)buffer);
 #endif
 					//waitForEnterEsc();
 				}
