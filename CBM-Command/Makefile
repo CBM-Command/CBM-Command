@@ -9,7 +9,7 @@ AR := $(CC65_PATH)ar65
 # POSIX-style programs
 CHMOD := chmod +w
 CP := cp
-MKDIR := mkdir
+MKDIR := mkdir -p
 RMDIR := $(RM) -r
 
 # VICE programs
@@ -22,12 +22,6 @@ XVIC := $(VICEPATH)xvic -autostart
 XPLUS4 := $(VICEPATH)xplus4 -autostart
 
 T := c64
-
-VIC_CONFIG := vic20-32k.cfg
-
-ifeq "$(T)" "vic20"
-LD_CONFIG := -C $(VIC_CONFIG)
-endif
 
 CONFIG_SOURCES := \
 	Configuration.c \
@@ -55,12 +49,10 @@ SOURCES	:= \
 ASMFILES := \
 	res/common/driveRoutines.s \
 	res/$(T)/PlatformSpecific.s \
-	cc65/common/_printf.s \
-	${wildcard cc65/$(T)/systime.s}
-# _systime() is a library function; but, it's called by only another library
-# function -- in only some of the programs.  Therefore, its substitute
-# must be linked directly.  [If it was in cc65.lib, then ld65 would pass by it
-# before time() asked for it.]
+	cc65/common/_printf.s
+# _printf() is a library function; but, it's called by only other library
+# functions.  Therefore, its substitute must be linked directly.  [If it was
+# in cc65.lib, then ld65 would pass by it before functions asked for it.]
 
 # These functions are called by the programs' files.
 # Their substitutes can be put into a library.
@@ -76,10 +68,17 @@ LIBFILES := \
 	cc65/conio/cputs.s \
 	cc65/conio/callgoto.s
 
-#DEBUG := -T --check-stack
-CFLAGS := -Wl -D__STACKSIZE__=$400
-CFLAGS1 := $(CFLAGS) $(DEBUG) #-m $(T)/cmd.map
-CFLAGS2 := $(CFLAGS) #-m $(T)/cfg.map
+VIC_CONFIG := vic20-32k.cfg
+
+ifeq "$(T)" "vic20"
+LD_CONFIG := -C $(VIC_CONFIG) -Wl -D__STACKSIZE__=$$400
+else
+LD_CONFIG := -Wl -D__STACKSIZE__=$$400
+endif
+
+#DEBUG := -g -T --check-stack
+CFLAGS1 := $(CFLAGS) $(DEBUG) #-g -vm -m $(T)/cmd.map
+CFLAGS2 := $(CFLAGS) #-g -vm -m $(T)/cfg.map
 
 TITLE := cbmcommand
 CONFIG_TITLE := cbmcmdcfg
@@ -90,31 +89,36 @@ CONFIG_PROGRAM := $(CONFIG_TITLE).$(T)
 LIBS := $(T)/cc65.lib
 
 .PHONY: all
+all: $(addsuffix progs,c128 c64 pet plus4 vic20)
+
+%progs:
+	$(MAKE) progs T:=$*
+
 ifeq "$(T)" "pet"
-all: pet/$(PROGRAM)40 pet/$(PROGRAM)80 pet/$(CONFIG_PROGRAM)40 pet/$(CONFIG_PROGRAM)80
+progs: pet/$(PROGRAM)40 pet/$(PROGRAM)80 pet/$(CONFIG_PROGRAM)40 pet/$(CONFIG_PROGRAM)80
 else
-all: $(T)/$(PROGRAM) $(T)/$(CONFIG_PROGRAM)
+progs: $(T)/$(PROGRAM) $(T)/$(CONFIG_PROGRAM)
 endif
 
 # Launch VICE
 .PHONY: vice
 ifeq "$(T)" "pet"
 vice: clean pet/$(TITLE).pet80
-		$(XPET) pet/$(TITLE).pet80
-#		$(XPET) pet/$(TITLE).pet40
+	$(XPET) pet/$(TITLE).pet80
+#	$(XPET) pet/$(TITLE).pet40
 else
 vice: clean $(T)/$(PROGRAM)
 ifeq "$(T)" "c64"
-		$(X64) $(T)/$(PROGRAM)
+	$(X64) $(T)/$(PROGRAM)
 endif
 ifeq "$(T)" "c128"
-		$(X128) $(T)/$(PROGRAM)
+	$(X128) $(T)/$(PROGRAM)
 endif
 ifeq "$(T)" "vic20"
-		$(XVIC) $(T)/$(PROGRAM)
+	$(XVIC) $(T)/$(PROGRAM)
 endif
 ifeq "$(T)" "plus4"
-		$(XPLUS4) $(T)/$(PROGRAM)
+	$(XPLUS4) $(T)/$(PROGRAM)
 endif
 endif
 
@@ -146,41 +150,34 @@ D80: all
 	$(C1541) $(TITLE).d80 -write vic20/$(CONFIG_TITLE).vic20 -write plus4/$(CONFIG_TITLE).plus4
 
 # Build our programs
-$(T)/$(PROGRAM) pet/$(PROGRAM)40: $(SOURCES) $(ASMFILES) $(LIBS)
-		$(CL) $(CFLAGS1) -v -O -t $(T) $(LD_CONFIG) -o $@ $+
+$(T)/$(PROGRAM) pet/$(PROGRAM)40: $(SOURCES) $(ASMFILES) $(LIBS) | $(T)
+	$(CL) -Or -t $(T) $(CFLAGS1) $(LD_CONFIG) -o $@ $+
 
-pet/$(PROGRAM)80: $(SOURCES) $(ASMFILES) $(LIBS)
-		$(CL) -D _PET80_ $(CFLAGS1) -Or -t pet -o $@ $+
+pet/$(PROGRAM)80: $(SOURCES) $(ASMFILES) $(LIBS) | $(T)
+	$(CL) -D _PET80_ -Or -t pet $(CFLAGS1) $(LD_CONFIG) -o $@ $+
 
-$(T)/$(CONFIG_PROGRAM) pet/$(CONFIG_PROGRAM)40: $(CONFIG_SOURCES) res/$(T)/PlatformSpecific.s $(LIBS)
-		$(CL) $(CFLAGS2) -v -O -t $(T) $(LD_CONFIG) -o $@ $+
+$(T)/$(CONFIG_PROGRAM) pet/$(CONFIG_PROGRAM)40: $(CONFIG_SOURCES) res/$(T)/PlatformSpecific.s $(LIBS) | $(T)
+	$(CL) -Or -t $(T) $(CFLAGS2) $(LD_CONFIG) -o $@ $+
 
-pet/$(CONFIG_PROGRAM)80: $(CONFIG_SOURCES) res/pet/PlatformSpecific.s $(LIBS)
-		$(CL) -D _PET80_ $(CFLAGS2) -Or -t pet -o $@ $+
-
-$(LIBS): | $(T)
+pet/$(CONFIG_PROGRAM)80: $(CONFIG_SOURCES) res/pet/PlatformSpecific.s $(LIBS) | $(T)
+	$(CL) -D _PET80_ -Or -t pet $(CFLAGS2) $(LD_CONFIG) -o $@ $+
 
 $(T):
-	$(MKDIR) $(T)
+	$(MKDIR) $@
 
-$(LIBS): $(LIBFILES)
-		$(CL) -Or -t $(T) -c $?
-		$(AR) a $@ $(addsuffix .o,${basename $?})
+$(LIBS): $(LIBFILES) | $(T)
+	$(CL) -Or -t $(T) -c $?
+	$(AR) a $@ $(addsuffix .o,${basename $?})
 
 # Our cleaning targets, for managing the project
 .PHONY: mostly-clean clean zap
 mostly-clean:
-		$(RM) $(SOURCES:.c=.o) $(SOURCES:.c=.s)
-		$(RM) $(CONFIG_SOURCES:.c=.o) $(CONFIG_SOURCES:.c=.s)
-		$(RM) $(ASMFILES:.s=.o)
-		$(RM) $(addsuffix .o,${basename $(LIBFILES)}) $(LIBS)
+	$(RM) $(SOURCES:.c=.s)
+	$(RM) *.o $(CONFIG_SOURCES:.c=.s)
+	$(RM) */*/*.o */cc65.lib
 
 clean: mostly-clean
-ifeq "$(T)" "pet"
-		$(RM) ${wildcard pet/$(TITLE).pet* pet/$(CONFIG_TITLE).pet*}
-else
-		$(RMDIR) $(T)
-endif
+	$(RMDIR) c128 c64 pet plus4 vic20
 
 zap: clean
 	$(RM) $(TITLE).d64 $(TITLE).d80
