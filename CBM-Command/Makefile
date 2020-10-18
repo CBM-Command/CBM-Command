@@ -64,7 +64,7 @@ LIBFILES := \
 	cc65/cbm/chline.s \
 	cc65/cbm/cvline.s \
 	${wildcard cc65/$(T)/clrscr.s} \
-	cc65/$(T)/cputc.s \
+	${wildcard cc65/$(T)/cputc.s} \
 	cc65/conio/cputs.s \
 	cc65/conio/callgoto.s
 
