@@ -44,9 +44,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <errno.h>
 #include <time.h>
 #include <device.h>
-#ifdef __C128__
-#include <c128.h>
-#endif
 #ifdef __CBM__
 #include <cbm.h>
 #endif
@@ -620,13 +617,13 @@ void copyFiles(void)
 					}
 					else
 					{
-						// Make a read- and write-filename string.
-						// Set the last byte to the size of the records.
+						// Make a write-filename string.
+						// Set the last character to the size of the records.
 						sprintf(targetFilename, "%s:%s,l,%c",
 							tp, currentNode->name, rel_size);
 
 						// Open the source file.
-						cbm_open(2, sd, 2, targetFilename);
+						cbmOpen(2, sd, 2, sp, currentNode->name, 0);
 
 						//cbm_open(126, td, 15, "");
 
