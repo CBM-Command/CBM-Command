@@ -29,7 +29,7 @@ unsigned char cbm_opendir (unsigned char lfn, unsigned char device, ...)
     va_list ap;
     const char* name = "$";
 
-    /* The name used in cbm_open() optionally may be passed. */
+    /* The name, used in cbm_open(), optionally may be passed. */
     if (__argsize__ == 4) {
         va_start (ap, device);
         name = va_arg (ap, const char*);
@@ -37,7 +37,7 @@ unsigned char cbm_opendir (unsigned char lfn, unsigned char device, ...)
     }
 
     /* Open the directory */
-    if (cbm_open (lfn, device, CBM_READ, name) == 0) {
+    if (!cbm_open (lfn, device, CBM_READ, name)) {
         if ((_oserror = cbm_k_chkin (lfn)) == 0) {
             /* Ignore start address */
             cbm_k_basin();
@@ -121,7 +121,7 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
 		i = 6;
 		do {
 		    l_dirent->access = byte = cbm_k_basin();
-		} while (--i != 0);
+		} while (--i);
 
             } else {
                 /* Go to the file-type column. */

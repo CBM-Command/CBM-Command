@@ -60,6 +60,7 @@ LIBFILES := \
 	cc65/common/strcat.s \
 	cc65/cbm/cbm_dir.c \
 	cc65/cbm/cbm_open.s \
+	cc65/cbm/cbm_read.s \
 	cc65/cbm/cclear.s \
 	cc65/cbm/chline.s \
 	cc65/cbm/cvline.s \
