@@ -11,9 +11,9 @@
 	.export		cputdirect, putchar, newline, plot
 
 	.import		callgoto
-	.import		PLOT, NEWLINE, PRINT
 
 	.include	"c128.inc"
+	.include	"cbm_kernal.inc"
 
 newline	:=	NEWLINE
 
