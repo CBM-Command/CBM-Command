@@ -10,5 +10,4 @@ vic20
 *.lbl
 *.log
 *.map
-cbmcommand.d64
-cbmcommand.d80
+output
